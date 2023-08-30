@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class FlagShareViewController: UIViewController {
     @IBOutlet var imageView: UIImageView!
@@ -23,15 +24,14 @@ class FlagShareViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         if let flagToLoad = selectedFlag {
-            imageView.image = UIImage(named: flagToLoad)
+            if let image = UIImage(named: flagToLoad) {
+                imageView.image = image
+                let roundedImage = image.imageWithRounded(corners: [.allCorners], radius: 2.0)
+                imageView.image = roundedImage
+                imageView.layer.backgroundColor = CGColor(gray: CGFloat(0.0), alpha: 0.03)
+                
+            }
         }
-        
-        shareButton.setImage(UIImage(systemName: "person.fill.questionmark"), for: .normal)
-        shareButton.target(forAction: #selector(shareTapped), withSender: self)
-        
-    }
-    
-    @IBAction func buttonTapped(_ sender: UIButton) {
         
     }
     
@@ -40,7 +40,7 @@ class FlagShareViewController: UIViewController {
         navigationController?.hidesBarsOnTap = true
         
     }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.hidesBarsOnTap = false
@@ -52,15 +52,31 @@ class FlagShareViewController: UIViewController {
         vc.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
         present(vc, animated: true)
     }
-
+    
     /*
-    // MARK: - Navigation
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destination.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
+}
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+extension UIImage {
+
+    public func imageWithRounded(corners theCorners: UIRectCorner, radius: CGFloat) -> UIImage {
+        let cornerRadius = CGSize(width: radius, height: radius)
+        let rect = CGRect(origin: .zero, size: size)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let img = renderer.image { ctx in
+            let bezierPath = UIBezierPath(roundedRect: rect, byRoundingCorners: theCorners, cornerRadii: cornerRadius)
+            bezierPath.addClip()
+            draw(in: rect)
+        }
+        return img
     }
-    */
 
 }
